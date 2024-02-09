@@ -51,14 +51,14 @@ jobs:
         inputs:
           SourceFolder: "out/CesiumGltfWriter"
           Contents: "*.a"
-          TargetFolder: upack-staging/lib
+          TargetFolder: upack-staging/linux/lib
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumJsonWriter lib to upack staging directory'
         inputs:
           SourceFolder: "out/CesiumJsonWriter"
           Contents: "*.a"
-          TargetFolder: upack-staging/lib
+          TargetFolder: upack-staging/linux/lib
 
       # Uncomment this task for testing without having to publish to upack feed
       # - task: PublishPipelineArtifact@1
@@ -67,6 +67,7 @@ jobs:
       #     artifactName: 'cesium-native_x64_linux'
 
       - task: UniversalPackages@0
+        displayName: 'Publish cesium-native to Universal Package feed'
         inputs:
           command: "publish"
           publishDirectory: "upack-staging/linux"
@@ -108,14 +109,14 @@ jobs:
         inputs:
           SourceFolder: "out/CesiumGltfWriter/Release"
           Contents: "*.lib"
-          TargetFolder: upack-staging/lib
+          TargetFolder: upack-staging/windows/lib
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
         inputs:
           SourceFolder: "out/CesiumJsonWriter/Release"
           Contents: "*.lib"
-          TargetFolder: upack-staging/lib
+          TargetFolder: upack-staging/windows/lib
 
       # Uncomment this task for testing without having to publish to upack feed     
       # - task: PublishPipelineArtifact@1
@@ -124,6 +125,7 @@ jobs:
       #     artifactName: 'cesium-native_x64_win'
 
       - task: UniversalPackages@0
+        displayName: 'Publish cesium-native to Universal Package feed'
         inputs:
           command: "publish"
           publishDirectory: "upack-staging/windows"
