@@ -171,6 +171,9 @@
     "KHR_materials_unlit glTF extension": {
       "overrideName": "ExtensionKhrMaterialsUnlit"
     },
+    "KHR_materials_specular glTF extension": {
+      "overrideName": "ExtensionKhrMaterialsSpecular"
+    },
     "MAXAR_mesh_variants glTF extension": {
       "overrideName": "ExtensionModelMaxarMeshVariants"
     },
@@ -239,6 +242,13 @@
     {
       "extensionName": "KHR_materials_unlit",
       "schema": "Khronos/KHR_materials_unlit/schema/glTF.KHR_materials_unlit.schema.json",
+      "attachTo": [
+        "material"
+      ]
+    },
+    {
+      "extensionName": "KHR_materials_specular",
+      "schema": "Khronos/KHR_materials_specular/schema/material.KHR_materials_specular.schema.json",
       "attachTo": [
         "material"
       ]

@@ -46,6 +46,7 @@
 #include <CesiumGltf/ExtensionExtMeshGpuInstancing.h>
 #include <CesiumGltf/ExtensionKhrDracoMeshCompression.h>
 #include <CesiumGltf/ExtensionKhrMaterialsUnlit.h>
+#include <CesiumGltf/ExtensionKhrMaterialsSpecular.h>
 #include <CesiumGltf/ExtensionKhrTextureBasisu.h>
 #include <CesiumGltf/ExtensionKhrTextureTransform.h>
 #include <CesiumGltf/ExtensionMeshPrimitiveExtFeatureMetadata.h>
@@ -156,6 +157,11 @@ void writeJson(
 
 void writeJson(
     const CesiumGltf::ExtensionKhrMaterialsUnlit& obj,
+    CesiumJsonWriter::JsonWriter& jsonWriter,
+    const CesiumJsonWriter::ExtensionWriterContext& context);
+
+void writeJson(
+    const CesiumGltf::ExtensionKhrMaterialsSpecular& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context);
 
@@ -944,6 +950,38 @@ void writeJson(
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   jsonWriter.StartObject();
+
+  writeExtensibleObject(obj, jsonWriter, context);
+
+  jsonWriter.EndObject();
+}
+
+void writeJson(
+    const CesiumGltf::ExtensionKhrMaterialsSpecular& obj,
+    CesiumJsonWriter::JsonWriter& jsonWriter,
+    const CesiumJsonWriter::ExtensionWriterContext& context) {
+  jsonWriter.StartObject();
+
+  if (obj.specularFactor != 1) {
+    jsonWriter.Key("specularFactor");
+    writeJson(obj.specularFactor, jsonWriter, context);
+  }
+
+  if (obj.specularTexture.has_value()) {
+    jsonWriter.Key("specularTexture");
+    writeJson(obj.specularTexture, jsonWriter, context);
+  }
+
+  static const std::vector<double> specularColorFactorDefault = {1, 1, 1};
+  if (obj.specularColorFactor != specularColorFactorDefault) {
+    jsonWriter.Key("specularColorFactor");
+    writeJson(obj.specularColorFactor, jsonWriter, context);
+  }
+
+  if (obj.specularColorTexture.has_value()) {
+    jsonWriter.Key("specularColorTexture");
+    writeJson(obj.specularColorTexture, jsonWriter, context);
+  }
 
   writeExtensibleObject(obj, jsonWriter, context);
 
@@ -3001,6 +3039,13 @@ void ExtensionKhrDracoMeshCompressionJsonWriter::write(
 
 void ExtensionKhrMaterialsUnlitJsonWriter::write(
     const CesiumGltf::ExtensionKhrMaterialsUnlit& obj,
+    CesiumJsonWriter::JsonWriter& jsonWriter,
+    const CesiumJsonWriter::ExtensionWriterContext& context) {
+  writeJson(obj, jsonWriter, context);
+}
+
+void ExtensionKhrMaterialsSpecularJsonWriter::write(
+    const CesiumGltf::ExtensionKhrMaterialsSpecular& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   writeJson(obj, jsonWriter, context);
