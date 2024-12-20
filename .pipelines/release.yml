@@ -18,7 +18,7 @@ jobs:
     displayName: Publish cesium-native on Linux
     condition: eq('${{parameters.LinuxBuild}}', true)
     pool:
-      name: iModelTechLnxDeb11
+      name: imodelNative-Debian12
       demands: "Agent.OS -equals Linux"
     steps:
       - checkout: self
@@ -36,7 +36,7 @@ jobs:
       - script: chmod +x tools/cmake-linux/bin/cmake      
         displayName: 'chmod +x on cmake executable'
 
-      - script: tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory) -B $(Build.SourcesDirectory)/out -D CMAKE_C_COMPILER=/usr/lib/llvm-13/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-13/bin/clang++        
+      - script: tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory) -B $(Build.SourcesDirectory)/out -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++
         displayName: 'Generate cmake project'
 
       - script: tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/out --target CesiumGltfWriter --config Release
