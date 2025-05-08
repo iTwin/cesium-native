@@ -1476,11 +1476,7 @@ namespace CesiumGltfReader {
 
 ExtensionKhrMaterialsSpecularJsonHandler::ExtensionKhrMaterialsSpecularJsonHandler(
     const CesiumJsonReader::JsonReaderOptions& options) noexcept
-    : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
-      _specularFactor(),
-      _specularTexture(options),
-      _specularColorFactor(),
-      _specularColorTexture(options) {}
+    : CesiumJsonReader::ExtensibleObjectJsonHandler(options) {}
 
 void ExtensionKhrMaterialsSpecularJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
@@ -1519,26 +1515,7 @@ ExtensionKhrMaterialsSpecularJsonHandler::readObjectKeyExtensionKhrMaterialsSpec
     CesiumGltf::ExtensionKhrMaterialsSpecular& o) {
   using namespace std::string_literals;
 
-  if ("specularFactor"s == str)
-    return property(
-        "specularFactor",
-        this->_specularFactor,
-        o.specularFactor);
-  if ("specularTexture"s == str)
-    return property(
-        "specularTexture",
-        this->_specularTexture,
-        o.specularTexture);
-  if ("specularColorFactor"s == str)
-    return property(
-        "specularColorFactor",
-        this->_specularColorFactor,
-        o.specularColorFactor);
-  if ("specularColorTexture"s == str)
-    return property(
-        "specularColorTexture",
-        this->_specularColorTexture,
-        o.specularColorTexture);
+  (void)o;
 
   return this->readObjectKeyExtensibleObject(objectType, str, *this->_pObject);
 }

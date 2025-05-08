@@ -962,27 +962,6 @@ void writeJson(
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   jsonWriter.StartObject();
 
-  if (obj.specularFactor != 1) {
-    jsonWriter.Key("specularFactor");
-    writeJson(obj.specularFactor, jsonWriter, context);
-  }
-
-  if (obj.specularTexture.has_value()) {
-    jsonWriter.Key("specularTexture");
-    writeJson(obj.specularTexture, jsonWriter, context);
-  }
-
-  static const std::vector<double> specularColorFactorDefault = {1, 1, 1};
-  if (obj.specularColorFactor != specularColorFactorDefault) {
-    jsonWriter.Key("specularColorFactor");
-    writeJson(obj.specularColorFactor, jsonWriter, context);
-  }
-
-  if (obj.specularColorTexture.has_value()) {
-    jsonWriter.Key("specularColorTexture");
-    writeJson(obj.specularColorTexture, jsonWriter, context);
-  }
-
   writeExtensibleObject(obj, jsonWriter, context);
 
   jsonWriter.EndObject();
