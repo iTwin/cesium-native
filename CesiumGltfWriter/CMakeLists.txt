@@ -36,23 +36,17 @@ target_sources(
     PRIVATE
         ${CESIUM_GLTF_WRITER_SOURCES}
         ${CESIUM_GLTF_WRITER_HEADERS}
-    PUBLIC
         ${CESIUM_GLTF_WRITER_PUBLIC_HEADERS}
 )
 
-target_compile_definitions(
-    CesiumGltfWriter
+cesium_target_include_directories(
+    TARGET
+        CesiumGltfWriter
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/generated/include>
+        $<INSTALL_INTERFACE:include>
     PRIVATE
-        ${CESIUM_NATIVE_RAPIDJSON_DEFINES}
-)
-
-target_include_directories(
-    CesiumGltfWriter
-    SYSTEM PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}/include
-        ${CMAKE_CURRENT_LIST_DIR}/generated/include
-    PRIVATE
-        ${CESIUM_NATIVE_STB_INCLUDE_DIR}
         ${CMAKE_CURRENT_LIST_DIR}/src
         ${CMAKE_CURRENT_LIST_DIR}/generated/src
 )
@@ -61,10 +55,7 @@ target_link_libraries(CesiumGltfWriter
     PUBLIC
         CesiumGltf
         CesiumJsonWriter
-        modp_b64
+    PRIVATE
+        modp_b64::modp_b64
 )
 
-install(TARGETS CesiumGltfWriter
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/CesiumGltfWriter
-)

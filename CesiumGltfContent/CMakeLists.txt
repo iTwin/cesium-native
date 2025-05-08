@@ -37,19 +37,19 @@ target_sources(
     PRIVATE
         ${CESIUM_GLTF_CONTENT_SOURCES}
         ${CESIUM_GLTF_CONTENT_HEADERS}
-    PUBLIC
         ${CESIUM_GLTF_CONTENT_PUBLIC_HEADERS}
 )
 
-target_include_directories(
-    CesiumGltfContent
-    SYSTEM PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}/include
-        ${CMAKE_CURRENT_LIST_DIR}/generated/include
+cesium_target_include_directories(
+    TARGET
+        CesiumGltfContent
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/generated/include>
+        $<INSTALL_INTERFACE:include>
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/src
         ${CMAKE_CURRENT_LIST_DIR}/generated/src
-        ${CESIUM_NATIVE_STB_INCLUDE_DIR}
 )
 
 target_link_libraries(CesiumGltfContent
@@ -60,9 +60,4 @@ target_link_libraries(CesiumGltfContent
         CesiumGltf
         CesiumGltfReader
         CesiumUtility
-)
-
-install(TARGETS CesiumGltfContent
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/CesiumGltfContent
 )

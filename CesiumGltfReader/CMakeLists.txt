@@ -37,19 +37,17 @@ target_sources(
     PRIVATE
         ${CESIUM_GLTF_READER_SOURCES}
         ${CESIUM_GLTF_READER_HEADERS}
-    PUBLIC
         ${CESIUM_GLTF_READER_PUBLIC_HEADERS}
 )
 
-target_include_directories(
-    CesiumGltfReader
-    SYSTEM PUBLIC
-        # Necessary for `draco/draco_features.h`
-        ${CESIUM_NATIVE_DRACO_INCLUDE_DIR}
-        ${CMAKE_CURRENT_LIST_DIR}/include
-        ${CMAKE_CURRENT_LIST_DIR}/generated/include
+cesium_target_include_directories(
+    TARGET
+        CesiumGltfReader
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/generated/include>
+        $<INSTALL_INTERFACE:include>
     PRIVATE
-        ${CESIUM_NATIVE_STB_INCLUDE_DIR}
         ${CMAKE_CURRENT_LIST_DIR}/src
         ${CMAKE_CURRENT_LIST_DIR}/generated/src
 )
@@ -59,17 +57,11 @@ target_link_libraries(CesiumGltfReader
         CesiumAsync
         CesiumGltf
         CesiumJsonReader
-        modp_b64
-        ${CESIUM_NATIVE_DRACO_LIBRARY}
+        draco::draco
     PRIVATE
-        ktx_read
-        webp
-        webpdecoder
-        turbojpeg
-        meshoptimizer
-)
-
-install(TARGETS CesiumGltfReader
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/CesiumGltfReader
+        meshoptimizer::meshoptimizer
+        modp_b64::modp_b64
+        KTX::ktx
+        WebP::webp WebP::webpdecoder
+        $<IF:$<TARGET_EXISTS:libjpeg-turbo::turbojpeg>,libjpeg-turbo::turbojpeg,libjpeg-turbo::turbojpeg-static>
 )

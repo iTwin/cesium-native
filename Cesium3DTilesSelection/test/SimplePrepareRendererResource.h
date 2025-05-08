@@ -1,12 +1,13 @@
 #pragma once
 
-#include "Cesium3DTilesSelection/IPrepareRendererResources.h"
-#include "Cesium3DTilesSelection/Tile.h"
-#include "CesiumRasterOverlays/RasterOverlayTile.h"
+#include <Cesium3DTilesSelection/IPrepareRendererResources.h>
+#include <Cesium3DTilesSelection/Tile.h>
+#include <CesiumRasterOverlays/RasterOverlayTile.h>
 
-#include <catch2/catch.hpp>
+#include <doctest/doctest.h>
 
 #include <atomic>
+#include <functional>
 
 namespace Cesium3DTilesSelection {
 class SimplePrepareRendererResource
@@ -33,6 +34,7 @@ public:
       TileLoadResult&& tileLoadResult,
       const glm::dmat4& /*transform*/,
       const std::any& /*rendererOptions*/) override {
+    prepareInLoadThreadTestCallback(tileLoadResult);
     return asyncSystem.createResolvedFuture(TileLoadResultAndRenderResources{
         std::move(tileLoadResult),
         new AllocationResult{totalAllocation}});
@@ -68,7 +70,7 @@ public:
   }
 
   virtual void* prepareRasterInLoadThread(
-      CesiumGltf::ImageCesium& /*image*/,
+      CesiumGltf::ImageAsset& /*image*/,
       const std::any& /*rendererOptions*/) override {
     return new AllocationResult{totalAllocation};
   }
@@ -115,5 +117,8 @@ public:
       int32_t /*overlayTextureCoordinateID*/,
       const CesiumRasterOverlays::RasterOverlayTile& /*rasterTile*/,
       void* /*pMainThreadRendererResources*/) noexcept override {}
+
+  std::function<void(const TileLoadResult&)> prepareInLoadThreadTestCallback =
+      [](const TileLoadResult& /*result*/) {};
 };
 } // namespace Cesium3DTilesSelection

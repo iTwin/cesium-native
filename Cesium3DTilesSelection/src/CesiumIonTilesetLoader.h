@@ -1,32 +1,38 @@
 #pragma once
 
-#include "TilesetContentLoaderResult.h"
+#include "CesiumAsync/IAssetAccessor.h"
 
 #include <Cesium3DTilesSelection/TilesetContentLoader.h>
+#include <Cesium3DTilesSelection/TilesetContentLoaderResult.h>
 #include <Cesium3DTilesSelection/TilesetExternals.h>
 
 #include <functional>
 #include <string>
 
 namespace Cesium3DTilesSelection {
-class CesiumIonTilesetLoader : public TilesetContentLoader {
-  enum class TokenRefreshState { None, Loading, Done, Failed };
 
+class CesiumIonAssetAccessor;
+
+class CesiumIonTilesetLoader : public TilesetContentLoader {
 public:
   using AuthorizationHeaderChangeListener = std::function<
       void(const std::string& header, const std::string& headerValue)>;
 
   CesiumIonTilesetLoader(
-      int64_t ionAssetID,
+      std::string&& url,
       std::string&& ionAccessToken,
-      std::string&& ionAssetEndpointUrl,
       std::unique_ptr<TilesetContentLoader>&& pAggregatedLoader,
-      AuthorizationHeaderChangeListener&& headerChangeListener);
+      AuthorizationHeaderChangeListener&& headerChangeListener,
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+
+  virtual ~CesiumIonTilesetLoader() noexcept;
 
   CesiumAsync::Future<TileLoadResult>
   loadTileContent(const TileLoadInput& loadInput) override;
 
-  TileChildrenResult createTileChildren(const Tile& tile) override;
+  TileChildrenResult createTileChildren(
+      const Tile& tile,
+      const CesiumGeospatial::Ellipsoid& ellipsoid) override;
 
   static CesiumAsync::Future<TilesetContentLoaderResult<CesiumIonTilesetLoader>>
   createLoader(
@@ -36,30 +42,51 @@ public:
       const std::string& ionAccessToken,
       const std::string& ionAssetEndpointUrl,
       const AuthorizationHeaderChangeListener& headerChangeListener,
-      bool showCreditsOnScreen);
+      bool showCreditsOnScreen,
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+
+protected:
+  static CesiumAsync::Future<TilesetContentLoaderResult<CesiumIonTilesetLoader>>
+  createLoader(
+      const TilesetExternals& externals,
+      const TilesetContentOptions& contentOptions,
+      const std::string& url,
+      const std::string& ionAccessToken,
+      bool needsAuthHeader,
+      const AuthorizationHeaderChangeListener& headerChangeListener,
+      bool showCreditsOnScreen,
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
 
   static CesiumAsync::Future<TilesetContentLoaderResult<CesiumIonTilesetLoader>>
   refreshTokenIfNeeded(
       const TilesetExternals& externals,
       const TilesetContentOptions& contentOptions,
-      int64_t ionAssetID,
+      const std::string& url,
       const std::string& ionAccessToken,
-      const std::string& ionAssetEndpointUrl,
+      bool needsAuthHeader,
       const AuthorizationHeaderChangeListener& headerChangeListener,
       bool showCreditsOnScreen,
-      TilesetContentLoaderResult<CesiumIonTilesetLoader>&& result);
+      TilesetContentLoaderResult<CesiumIonTilesetLoader>&& result,
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+
+protected:
+  void setOwnerOfNestedLoaders(TilesetContentManager& owner) noexcept override;
 
 private:
-  void refreshTokenInMainThread(
-      const std::shared_ptr<spdlog::logger>& pLogger,
-      const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
-      const CesiumAsync::AsyncSystem& asyncSystem);
+  CesiumAsync::SharedFuture<std::string> refreshTokenInMainThread(
+      const CesiumAsync::AsyncSystem& asyncSystem,
+      const std::string& currentAuthorizationHeader);
 
-  TokenRefreshState _refreshTokenState;
-  int64_t _ionAssetID;
+  CesiumGeospatial::Ellipsoid _ellipsoid;
+  std::string _url;
   std::string _ionAccessToken;
-  std::string _ionAssetEndpointUrl;
   std::unique_ptr<TilesetContentLoader> _pAggregatedLoader;
   AuthorizationHeaderChangeListener _headerChangeListener;
+  std::shared_ptr<spdlog::logger> _pLogger;
+  std::shared_ptr<CesiumAsync::IAssetAccessor> _pTilesetAccessor;
+  std::shared_ptr<CesiumIonAssetAccessor> _pIonAccessor;
+  std::optional<CesiumAsync::SharedFuture<std::string>> _tokenRefreshInProgress;
+
+  friend class CesiumIonAssetAccessor;
 };
 } // namespace Cesium3DTilesSelection

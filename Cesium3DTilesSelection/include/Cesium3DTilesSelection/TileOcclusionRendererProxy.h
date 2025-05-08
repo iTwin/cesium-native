@@ -1,16 +1,17 @@
 #pragma once
 
-#include "Library.h"
-#include "Tile.h"
+#include <Cesium3DTilesSelection/Library.h>
+#include <Cesium3DTilesSelection/Tile.h>
 
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
 
+namespace Cesium3DTilesSelection {
+
 /**
  * @brief The occlusion state of a tile as reported by the renderer proxy.
  */
-namespace Cesium3DTilesSelection {
 enum class CESIUM3DTILESSELECTION_API TileOcclusionState {
   /**
    * @brief The renderer does not yet know if the tile's bounding volume is
@@ -103,12 +104,11 @@ public:
    * assigning a proxy from the free list.
    *
    * @param tile The tile.
-   * @param currentFrame The current frame number.
    * @return The occlusion proxy mapped to this tile, or nullptr if one can't
    * be made.
    */
   const TileOcclusionRendererProxy*
-  fetchOcclusionProxyForTile(const Tile& tile, int32_t currentFrame);
+  fetchOcclusionProxyForTile(const Tile& tile);
 
   /**
    * @brief Prunes the occlusion proxy mappings and removes any mappings that

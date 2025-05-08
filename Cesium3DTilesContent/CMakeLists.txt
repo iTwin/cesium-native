@@ -37,15 +37,15 @@ target_sources(
     PRIVATE
         ${CESIUM_3DTILES_CONTENT_SOURCES}
         ${CESIUM_3DTILES_CONTENT_HEADERS}
-    PUBLIC
         ${CESIUM_3DTILES_CONTENT_PUBLIC_HEADERS}
 )
 
 target_include_directories(
     Cesium3DTilesContent
-    SYSTEM PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}/include
-        ${CMAKE_CURRENT_LIST_DIR}/generated/include
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/generated/include>
+        $<INSTALL_INTERFACE:include>
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/src
         ${CMAKE_CURRENT_LIST_DIR}/generated/src
@@ -62,15 +62,6 @@ target_link_libraries(Cesium3DTilesContent
         CesiumGltfContent
         CesiumGltfReader
         CesiumUtility
-)
-
-target_link_libraries_system(
-    Cesium3DTilesContent
     PRIVATE
-        libmorton
-)
-
-install(TARGETS Cesium3DTilesContent
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/Cesium3DTilesContent
+        libmorton::libmorton
 )

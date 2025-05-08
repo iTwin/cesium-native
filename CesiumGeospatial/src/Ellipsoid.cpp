@@ -1,15 +1,21 @@
-#include "CesiumGeospatial/Ellipsoid.h"
-
+#include <CesiumGeospatial/Cartographic.h>
+#include <CesiumGeospatial/Ellipsoid.h>
 #include <CesiumUtility/Math.h>
 
+#include <glm/common.hpp>
+#include <glm/ext/vector_double3.hpp>
 #include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
+
+#include <cmath>
+#include <optional>
 
 using namespace CesiumUtility;
 
 namespace CesiumGeospatial {
 
 const Ellipsoid Ellipsoid::WGS84(6378137.0, 6378137.0, 6356752.3142451793);
+const Ellipsoid Ellipsoid::UNIT_SPHERE(1.0, 1.0, 1.0);
 
 glm::dvec3
 Ellipsoid::geodeticSurfaceNormal(const glm::dvec3& position) const noexcept {

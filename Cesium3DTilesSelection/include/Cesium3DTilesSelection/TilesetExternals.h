@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Library.h"
-#include "TileOcclusionRendererProxy.h"
-#include "spdlog-cesium.h"
-
+#include <Cesium3DTilesSelection/Library.h>
+#include <Cesium3DTilesSelection/TileOcclusionRendererProxy.h>
+#include <Cesium3DTilesSelection/TilesetSharedAssetSystem.h>
+#include <Cesium3DTilesSelection/spdlog-cesium.h>
 #include <CesiumAsync/AsyncSystem.h>
 
 #include <memory>
@@ -47,9 +47,9 @@ public:
   CesiumAsync::AsyncSystem asyncSystem;
 
   /**
-   * @brief An external {@link CreditSystem} that can be used to manage credit
-   * strings and track which which credits to show and remove from the screen
-   * each frame.
+   * @brief An external {@link CesiumUtility::CreditSystem} that can be used to manage credit
+   * strings and periodically query which credits to show and and which to
+   * remove from the screen.
    */
   std::shared_ptr<CesiumUtility::CreditSystem> pCreditSystem;
 
@@ -69,6 +69,13 @@ public:
    */
   std::shared_ptr<TileOcclusionRendererProxyPool> pTileOcclusionProxyPool =
       nullptr;
+
+  /**
+   * @brief The shared asset system used to facilitate sharing of common assets,
+   * such as images, between and within tilesets.
+   */
+  CesiumUtility::IntrusivePointer<TilesetSharedAssetSystem> pSharedAssetSystem =
+      TilesetSharedAssetSystem::getDefault();
 };
 
 } // namespace Cesium3DTilesSelection

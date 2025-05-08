@@ -24,26 +24,21 @@ target_sources(
     PRIVATE
         ${CESIUM_JSON_READER_SOURCES}
         ${CESIUM_JSON_READER_HEADERS}
-    PUBLIC
         ${CESIUM_JSON_READER_PUBLIC_HEADERS}
 )
 
-target_include_directories(
-    CesiumJsonReader
-    SYSTEM PUBLIC
-        ${CMAKE_BINARY_DIR}
-        ${CMAKE_CURRENT_LIST_DIR}/include
+cesium_target_include_directories(
+    TARGET
+        CesiumJsonReader
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+        $<INSTALL_INTERFACE:include>
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/src
 )
 
 target_link_libraries(CesiumJsonReader
     PUBLIC
-        GSL
         CesiumUtility
-)
-
-install(TARGETS CesiumJsonReader
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/CesiumJsonReader
 )
