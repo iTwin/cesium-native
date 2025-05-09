@@ -19,10 +19,6 @@ resources:
       type: github
       name: microsoft/vcpkg
       endpoint: github.com_test
-    - repository: cesium-native-2
-      type: github
-      name: CesiumGS/cesium-native
-      endpoint: github.com_test
 
 jobs:
   - job:
@@ -57,7 +53,7 @@ jobs:
       - script: chmod +x $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake      
         displayName: 'chmod +x on cmake executable'
 
-      - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory)/cesium-native-2 -B $(Build.SourcesDirectory)/cesium-native/out -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++ -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-linux -DVCPKG_HOST_TRIPLET=x64-linux
+      - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory)/cesium-native -B $(Build.SourcesDirectory)/cesium-native/out -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++ -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-linux -DVCPKG_HOST_TRIPLET=x64-linux
         displayName: 'Generate cmake project'
 
       - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/cesium-native/out --target CesiumGltfWriter --config Release
@@ -66,23 +62,23 @@ jobs:
       # - script: cat $(Build.SourcesDirectory)/vcpkg/buildtrees/ktx/git-archive-err.log
         # condition: always()
 
-      - template: copy-include-files.yml
-        parameters:
-          platform: linux 
+      # - template: copy-include-files.yml
+        # parameters:
+          # platform: linux 
 
-      - task: CopyFiles@2
-        displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
-        inputs:
-          SourceFolder: "out/CesiumGltfWriter"
-          Contents: "*.a"
-          TargetFolder: upack-staging/linux/lib
+      # - task: CopyFiles@2
+        # displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
+        # inputs:
+          # SourceFolder: "out/CesiumGltfWriter"
+          # Contents: "*.a"
+          # TargetFolder: upack-staging/linux/lib
 
-      - task: CopyFiles@2
-        displayName: 'Copy CesiumJsonWriter lib to upack staging directory'
-        inputs:
-          SourceFolder: "out/CesiumJsonWriter"
-          Contents: "*.a"
-          TargetFolder: upack-staging/linux/lib
+      # - task: CopyFiles@2
+        # displayName: 'Copy CesiumJsonWriter lib to upack staging directory'
+        # inputs:
+          # SourceFolder: "out/CesiumJsonWriter"
+          # Contents: "*.a"
+          # TargetFolder: upack-staging/linux/lib
 
       # Uncomment this task for testing without having to publish to upack feed
       # - task: PublishPipelineArtifact@1
@@ -129,23 +125,23 @@ jobs:
         inputs:
           cmakeArgs: --build $(Build.SourcesDirectory)/cesium-native/out --target CesiumGltfWriter --config Release
       
-      - template: copy-include-files.yml       
-        parameters:
-          platform: windows 
+      # - template: copy-include-files.yml       
+        # parameters:
+          # platform: windows 
 
-      - task: CopyFiles@2
-        displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
-        inputs:
-          SourceFolder: "out/CesiumGltfWriter/Release"
-          Contents: "*.lib"
-          TargetFolder: upack-staging/windows/lib
+      # - task: CopyFiles@2
+        # displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
+        # inputs:
+          # SourceFolder: "out/CesiumGltfWriter/Release"
+          # Contents: "*.lib"
+          # TargetFolder: upack-staging/windows/lib
 
-      - task: CopyFiles@2
-        displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
-        inputs:
-          SourceFolder: "out/CesiumJsonWriter/Release"
-          Contents: "*.lib"
-          TargetFolder: upack-staging/windows/lib
+      # - task: CopyFiles@2
+        # displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
+        # inputs:
+          # SourceFolder: "out/CesiumJsonWriter/Release"
+          # Contents: "*.lib"
+          # TargetFolder: upack-staging/windows/lib
 
       # Uncomment this task for testing without having to publish to upack feed     
       # - task: PublishPipelineArtifact@1
