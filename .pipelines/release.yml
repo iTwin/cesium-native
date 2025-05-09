@@ -29,12 +29,10 @@ jobs:
       demands: "Agent.OS -equals Linux"
     steps:
       - checkout: self
-        lfs: true
         submodules: recursive
         persistCredentials: true
         
       - checkout: vcpkg
-        lfs: true
         submodules: recursive
         persistCredentials: true
 
