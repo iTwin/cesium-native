@@ -22,7 +22,6 @@ struct ExtensionModelExtStructuralMetadata;
 struct ExtensionMeshPrimitiveExtStructuralMetadata;
 struct ExtensionKhrDracoMeshCompression;
 struct ExtensionKhrMaterialsUnlit;
-struct ExtensionKhrMaterialsSpecular;
 struct ExtensionModelKhrMaterialsVariants;
 struct ExtensionMeshPrimitiveKhrMaterialsVariants;
 struct ExtensionKhrTextureBasisu;
@@ -243,17 +242,6 @@ struct ExtensionKhrMaterialsUnlitJsonWriter {
 
   static void write(
       const CesiumGltf::ExtensionKhrMaterialsUnlit& obj,
-      CesiumJsonWriter::JsonWriter& jsonWriter,
-      const CesiumJsonWriter::ExtensionWriterContext& context);
-};
-
-struct ExtensionKhrMaterialsSpecularJsonWriter {
-  using ValueType = CesiumGltf::ExtensionKhrMaterialsSpecular;
-
-  static inline constexpr const char* ExtensionName = "KHR_materials_specular";
-
-  static void write(
-      const CesiumGltf::ExtensionKhrMaterialsSpecular& obj,
       CesiumJsonWriter::JsonWriter& jsonWriter,
       const CesiumJsonWriter::ExtensionWriterContext& context);
 };

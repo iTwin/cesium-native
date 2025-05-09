@@ -40,7 +40,6 @@
 #include <CesiumGltf/ExtensionKhrDracoMeshCompression.h>
 #include <CesiumGltf/ExtensionKhrImplicitShapes.h>
 #include <CesiumGltf/ExtensionKhrMaterialsUnlit.h>
-#include <CesiumGltf/ExtensionKhrMaterialsSpecular.h>
 #include <CesiumGltf/ExtensionKhrTextureBasisu.h>
 #include <CesiumGltf/ExtensionKhrTextureTransform.h>
 #include <CesiumGltf/ExtensionMeshPrimitiveExtStructuralMetadata.h>
@@ -156,11 +155,6 @@ void writeJson(
 
 void writeJson(
     const CesiumGltf::ExtensionKhrMaterialsUnlit& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context);
-
-void writeJson(
-    const CesiumGltf::ExtensionKhrMaterialsSpecular& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context);
 
@@ -901,17 +895,6 @@ void writeJson(
 
 void writeJson(
     const CesiumGltf::ExtensionKhrMaterialsUnlit& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  jsonWriter.StartObject();
-
-  writeExtensibleObject(obj, jsonWriter, context);
-
-  jsonWriter.EndObject();
-}
-
-void writeJson(
-    const CesiumGltf::ExtensionKhrMaterialsSpecular& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   jsonWriter.StartObject();
@@ -2820,13 +2803,6 @@ void ExtensionKhrDracoMeshCompressionJsonWriter::write(
 
 void ExtensionKhrMaterialsUnlitJsonWriter::write(
     const CesiumGltf::ExtensionKhrMaterialsUnlit& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  writeJson(obj, jsonWriter, context);
-}
-
-void ExtensionKhrMaterialsSpecularJsonWriter::write(
-    const CesiumGltf::ExtensionKhrMaterialsSpecular& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   writeJson(obj, jsonWriter, context);
