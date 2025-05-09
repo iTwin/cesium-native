@@ -41,17 +41,17 @@ jobs:
       - task: ExtractFiles@1
         displayName: 'Extract cmake executable'
         inputs:
-          archiveFilePatterns: "tools/cmake-linux.zip"
-          destinationFolder: "tools"
+          archiveFilePatterns: "$(Build.SourcesDirectory)/cesium-native/tools/cmake-linux.zip"
+          destinationFolder: "$(Build.SourcesDirectory)/cesium-native/tools"
           cleanDestinationFolder: false
 
-      - script: chmod +x tools/cmake-linux/bin/cmake      
+      - script: chmod +x $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake      
         displayName: 'chmod +x on cmake executable'
 
-      - script: tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory) -B $(Build.SourcesDirectory)/out -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++ -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-linux -DVCPKG_HOST_TRIPLET=x64-linux
+      - script: tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory)/cesium-native -B $(Build.SourcesDirectory)/cesium-native/out -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++ -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-linux -DVCPKG_HOST_TRIPLET=x64-linux
         displayName: 'Generate cmake project'
 
-      - script: tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/out --target CesiumGltfWriter --config Release
+      - script: tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/cesium-native/out --target CesiumGltfWriter --config Release
         displayName: 'Build CesiumGltfWriter target'
 
       - template: copy-include-files.yml
