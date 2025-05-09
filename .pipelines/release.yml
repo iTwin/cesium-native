@@ -78,18 +78,18 @@ jobs:
       #     targetPath: 'upack-staging'
       #     artifactName: 'cesium-native_x64_linux'
 
-      - task: UniversalPackages@0
-        displayName: 'Publish cesium-native to Universal Package feed'
-        inputs:
-          command: "publish"
-          publishDirectory: "upack-staging/linux"
-          feedsToUsePublish: "internal"
-          vstsFeedPublish: "upack"
-          vstsFeedPackagePublish: "cesium_native_x64_linux"
-          versionOption: "custom"
-          versionPublish: ${{parameters.PackageVersion}}
-        env:
-          AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+      # - task: UniversalPackages@0
+        # displayName: 'Publish cesium-native to Universal Package feed'
+        # inputs:
+          # command: "publish"
+          # publishDirectory: "upack-staging/linux"
+          # feedsToUsePublish: "internal"
+          # vstsFeedPublish: "upack"
+          # vstsFeedPackagePublish: "cesium_native_x64_linux"
+          # versionOption: "custom"
+          # versionPublish: ${{parameters.PackageVersion}}
+        # env:
+          # AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
   - job:
     displayName: Publish cesium-native on Windows
