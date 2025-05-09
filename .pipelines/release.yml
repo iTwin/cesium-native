@@ -13,6 +13,13 @@ parameters:
     type: boolean
     default: false
 
+resources:
+  repositories:
+    - repository: vcpkg
+      type: github
+      name: microsoft/vcpkg
+      endpoint: github.com_test
+
 jobs:
   - job:
     displayName: Publish cesium-native on Linux
@@ -89,16 +96,21 @@ jobs:
         lfs: true
         submodules: recursive
         persistCredentials: true
+        
+      - checkout: vcpkg
+        lfs: true
+        submodules: recursive
+        persistCredentials: true 
 
       - task: CMake@1
         displayName: 'Generate cmake project'
         inputs:
-          cmakeArgs: -S $(Build.SourcesDirectory) -B $(Build.SourcesDirectory)/out -G "Visual Studio 16 2019"
+          cmakeArgs: -S $(Build.SourcesDirectory)/cesium-native -B $(Build.SourcesDirectory)/cesium-native/out -G "Visual Studio 16 2019" -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-windows-static-md -DVCPKG_HOST_TRIPLET=x64-windows-static-md
 
       - task: CMake@1
         displayName: 'Build CesiumGltfWriter target'
         inputs:
-          cmakeArgs: --build $(Build.SourcesDirectory)/out --target CesiumGltfWriter --config Release
+          cmakeArgs: --build $(Build.SourcesDirectory)/cesium-native/out --target CesiumGltfWriter --config Release
       
       - template: copy-include-files.yml       
         parameters:
@@ -124,15 +136,15 @@ jobs:
       #     targetPath: 'upack-staging'
       #     artifactName: 'cesium-native_x64_win'
 
-      - task: UniversalPackages@0
-        displayName: 'Publish cesium-native to Universal Package feed'
-        inputs:
-          command: "publish"
-          publishDirectory: "upack-staging/windows"
-          feedsToUsePublish: "internal"
-          vstsFeedPublish: "upack"
-          vstsFeedPackagePublish: "cesium_native_x64_win"
-          versionOption: "custom"
-          versionPublish: ${{parameters.PackageVersion}}
-        env:
-          AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+      # - task: UniversalPackages@0
+        # displayName: 'Publish cesium-native to Universal Package feed'
+        # inputs:
+          # command: "publish"
+          # publishDirectory: "upack-staging/windows"
+          # feedsToUsePublish: "internal"
+          # vstsFeedPublish: "upack"
+          # vstsFeedPackagePublish: "cesium_native_x64_win"
+          # versionOption: "custom"
+          # versionPublish: ${{parameters.PackageVersion}}
+        # env:
+          # AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
