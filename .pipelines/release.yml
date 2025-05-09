@@ -95,7 +95,7 @@ jobs:
     displayName: Publish cesium-native on Windows
     condition: eq('${{parameters.WindowsBuild}}', true)
     pool:
-      name: imodelNative-Win11-VS2022
+      name: TilesetPublisher-rendering
     steps:
       - checkout: self
         lfs: true
