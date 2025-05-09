@@ -54,6 +54,9 @@ jobs:
       - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/cesium-native/out --target CesiumGltfWriter --config Release
         displayName: 'Build CesiumGltfWriter target'
 
+      - script: cat $(Build.SourcesDirectory)/vcpkg/buildtrees/ktx/git-archive-err.log
+        condition: always()
+
       - template: copy-include-files.yml
         parameters:
           platform: linux 
