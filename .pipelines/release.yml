@@ -37,11 +37,6 @@ jobs:
         lfs: true
         submodules: recursive
         persistCredentials: true
-        
-      - checkout: cesium-native-2
-        lfs: true
-        submodules: recursive
-        persistCredentials: true 
 
       - task: ExtractFiles@1
         displayName: 'Extract cmake executable'
