@@ -13,13 +13,6 @@ parameters:
     type: boolean
     default: false
 
-resources:
-  repositories:
-    - repository: vcpkg
-      type: github
-      name: microsoft/vcpkg
-      endpoint: github.com_test
-
 jobs:
   - job:
     displayName: Publish cesium-native on Linux
@@ -32,32 +25,24 @@ jobs:
         lfs: true
         submodules: recursive
         persistCredentials: true
-        
-      - checkout: vcpkg
-        lfs: true
-        submodules: recursive
-        persistCredentials: true
 
       - task: ExtractFiles@1
         displayName: 'Extract cmake executable'
         inputs:
-          archiveFilePatterns: "$(Build.SourcesDirectory)/cesium-native/tools/cmake-linux.zip"
-          destinationFolder: "$(Build.SourcesDirectory)/cesium-native/tools"
+          archiveFilePatterns: "tools/cmake-linux.zip"
+          destinationFolder: "tools"
           cleanDestinationFolder: false
 
-      - script: chmod +x $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake      
+      - script: chmod +x tools/cmake-linux/bin/cmake      
         displayName: 'chmod +x on cmake executable'
 
-      - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory)/cesium-native -B $(Build.SourcesDirectory)/cesium-native/out -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++ -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-linux -DVCPKG_HOST_TRIPLET=x64-linux
+      - script: tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory) -B $(Build.SourcesDirectory)/out -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++
         displayName: 'Generate cmake project'
         env:
-          GIT_LFS_SKIP_SMUDGE: 1        
+          GIT_LFS_SKIP_SMUDGE: 1
 
-      - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/cesium-native/out --target CesiumGltfWriter --config Release
+      - script: tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/out --target CesiumGltfWriter --config Release
         displayName: 'Build CesiumGltfWriter target'
-
-      # - script: cat $(Build.SourcesDirectory)/vcpkg/buildtrees/ktx/git-archive-err.log
-        # condition: always()
 
       - template: copy-include-files.yml
         parameters:
@@ -100,27 +85,24 @@ jobs:
     displayName: Publish cesium-native on Windows
     condition: eq('${{parameters.WindowsBuild}}', true)
     pool:
-      name: imodelNative-Win11-VS2022
+      vmImage: "windows-2019"
     steps:
       - checkout: self
         lfs: true
         submodules: recursive
         persistCredentials: true
-        
-      - checkout: vcpkg
-        lfs: true
-        submodules: recursive
-        persistCredentials: true 
 
       - task: CMake@1
         displayName: 'Generate cmake project'
         inputs:
-          cmakeArgs: -S $(Build.SourcesDirectory)/cesium-native -B $(Build.SourcesDirectory)/cesium-native/out -G "Visual Studio 16 2019" -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-windows-static-md -DVCPKG_HOST_TRIPLET=x64-windows-static-md
+          cmakeArgs: -S $(Build.SourcesDirectory) -B $(Build.SourcesDirectory)/out -G "Visual Studio 16 2019"
+        env:
+          GIT_LFS_SKIP_SMUDGE: 1
 
       - task: CMake@1
         displayName: 'Build CesiumGltfWriter target'
         inputs:
-          cmakeArgs: --build $(Build.SourcesDirectory)/cesium-native/out --target CesiumGltfWriter --config Release
+          cmakeArgs: --build $(Build.SourcesDirectory)/out --target CesiumGltfWriter --config Release
       
       - template: copy-include-files.yml       
         parameters:
