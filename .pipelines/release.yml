@@ -53,14 +53,14 @@ jobs:
         inputs:
           SourceFolder: "build/vcpkg_installed/x64-linux/include/glm"
           Contents: "**"
-          TargetFolder: upack-staging/${{ parameters.platform }}/include/glm
+          TargetFolder: upack-staging/linux/include/glm
 
       - task: CopyFiles@2
         displayName: 'Copy GSL include files to upack staging directory'
         inputs:
           SourceFolder: "build/vcpkg_installed/x64-linux/include/gsl"
           Contents: "**"
-          TargetFolder: upack-staging/${{ parameters.platform }}/include/gsl
+          TargetFolder: upack-staging/linux/include/gsl
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
@@ -127,14 +127,14 @@ jobs:
         inputs:
           SourceFolder: "build/vcpkg_installed/x64-windows-static-md/include/glm"
           Contents: "**"
-          TargetFolder: upack-staging/${{ parameters.platform }}/include/glm
+          TargetFolder: upack-staging/windows/include/glm
 
       - task: CopyFiles@2
         displayName: 'Copy GSL include files to upack staging directory'
         inputs:
           SourceFolder: "build/vcpkg_installed/x64-windows-static-md/include/gsl"
           Contents: "**"
-          TargetFolder: upack-staging/${{ parameters.platform }}/include/gsl
+          TargetFolder: upack-staging/windows/include/gsl
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
