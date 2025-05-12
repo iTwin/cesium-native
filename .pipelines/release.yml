@@ -59,6 +59,8 @@ jobs:
 
       - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory)/cesium-native-2 -B $(Build.SourcesDirectory)/cesium-native/out -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++ -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-linux -DVCPKG_HOST_TRIPLET=x64-linux
         displayName: 'Generate cmake project'
+        env:
+          GIT_LFS_SKIP_SMUDGE: 1        
 
       - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/cesium-native/out --target CesiumGltfWriter --config Release
         displayName: 'Build CesiumGltfWriter target'
