@@ -36,29 +36,43 @@ jobs:
       - script: chmod +x tools/cmake-linux/bin/cmake      
         displayName: 'chmod +x on cmake executable'
 
-      - script: tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory) -B $(Build.SourcesDirectory)/out -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++
+      - script: tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory) -B $(Build.SourcesDirectory)/build -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++
         displayName: 'Generate cmake project'
         env:
           GIT_LFS_SKIP_SMUDGE: 1
 
-      - script: tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/out --target CesiumGltfWriter --config Release
+      - script: tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/build --target CesiumGltfWriter --config Release
         displayName: 'Build CesiumGltfWriter target'
 
       - template: copy-include-files.yml
         parameters:
-          platform: linux 
+          platform: linux
+
+      - task: CopyFiles@2
+        displayName: 'Copy glm files to upack staging directory'
+        inputs:
+          SourceFolder: "build/vcpkg_installed/x64-linux/include/glm"
+          Contents: "**"
+          TargetFolder: upack-staging/${{ parameters.platform }}/include/glm
+
+      - task: CopyFiles@2
+        displayName: 'Copy GSL include files to upack staging directory'
+        inputs:
+          SourceFolder: "build/vcpkg_installed/x64-linux/include/gsl"
+          Contents: "**"
+          TargetFolder: upack-staging/${{ parameters.platform }}/include/gsl
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
         inputs:
-          SourceFolder: "out/CesiumGltfWriter"
+          SourceFolder: "build/CesiumGltfWriter"
           Contents: "*.a"
           TargetFolder: upack-staging/linux/lib
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumJsonWriter lib to upack staging directory'
         inputs:
-          SourceFolder: "out/CesiumJsonWriter"
+          SourceFolder: "build/CesiumJsonWriter"
           Contents: "*.a"
           TargetFolder: upack-staging/linux/lib
 
@@ -95,30 +109,44 @@ jobs:
       - task: CMake@1
         displayName: 'Generate cmake project'
         inputs:
-          cmakeArgs: -S $(Build.SourcesDirectory) -B $(Build.SourcesDirectory)/out -G "Visual Studio 16 2019"
+          cmakeArgs: -S $(Build.SourcesDirectory) -B $(Build.SourcesDirectory)/build -G "Visual Studio 16 2019"
         env:
           GIT_LFS_SKIP_SMUDGE: 1
 
       - task: CMake@1
         displayName: 'Build CesiumGltfWriter target'
         inputs:
-          cmakeArgs: --build $(Build.SourcesDirectory)/out --target CesiumGltfWriter --config Release
+          cmakeArgs: --build $(Build.SourcesDirectory)/build --target CesiumGltfWriter --config Release
       
       - template: copy-include-files.yml       
         parameters:
           platform: windows 
 
       - task: CopyFiles@2
+        displayName: 'Copy glm files to upack staging directory'
+        inputs:
+          SourceFolder: "build/vcpkg_installed/x64-windows-static-md/include/glm"
+          Contents: "**"
+          TargetFolder: upack-staging/${{ parameters.platform }}/include/glm
+
+      - task: CopyFiles@2
+        displayName: 'Copy GSL include files to upack staging directory'
+        inputs:
+          SourceFolder: "build/vcpkg_installed/x64-windows-static-md/include/gsl"
+          Contents: "**"
+          TargetFolder: upack-staging/${{ parameters.platform }}/include/gsl
+
+      - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
         inputs:
-          SourceFolder: "out/CesiumGltfWriter/Release"
+          SourceFolder: "build/CesiumGltfWriter/Release"
           Contents: "*.lib"
           TargetFolder: upack-staging/windows/lib
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
         inputs:
-          SourceFolder: "out/CesiumJsonWriter/Release"
+          SourceFolder: "build/CesiumJsonWriter/Release"
           Contents: "*.lib"
           TargetFolder: upack-staging/windows/lib
 

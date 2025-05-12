@@ -37,19 +37,5 @@ steps:
     inputs:
       SourceFolder: "CesiumGltfWriter/include/CesiumGltfWriter"
       Contents: "**"
-      TargetFolder: upack-staging/${{ parameters.platform }}/include/CesiumGltfWriter   
-
-  - task: CopyFiles@2
-    displayName: 'Copy extern/glm include files to upack staging directory'
-    inputs:
-      SourceFolder: "extern/glm/glm"
-      Contents: "**"
-      TargetFolder: upack-staging/${{ parameters.platform }}/include/glm
-
-  - task: CopyFiles@2
-    displayName: 'Copy extern/GSL include files to upack staging directory'
-    inputs:
-      SourceFolder: "extern/GSL/include/gsl"
-      Contents: "**"
-      TargetFolder: upack-staging/${{ parameters.platform }}/include/gsl
+      TargetFolder: upack-staging/${{ parameters.platform }}/include/CesiumGltfWriter
 
