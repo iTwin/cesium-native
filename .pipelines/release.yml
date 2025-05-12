@@ -19,10 +19,6 @@ resources:
       type: github
       name: microsoft/vcpkg
       endpoint: github.com_test
-    - repository: cesium-native-2
-      type: github
-      name: CesiumGS/cesium-native
-      endpoint: github.com_test
 
 jobs:
   - job:
@@ -41,11 +37,6 @@ jobs:
         lfs: true
         submodules: recursive
         persistCredentials: true
-        
-      - checkout: cesium-native-2
-        lfs: true
-        submodules: recursive
-        persistCredentials: true 
 
       - task: ExtractFiles@1
         displayName: 'Extract cmake executable'
@@ -57,7 +48,7 @@ jobs:
       - script: chmod +x $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake      
         displayName: 'chmod +x on cmake executable'
 
-      - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory)/cesium-native-2 -B $(Build.SourcesDirectory)/cesium-native/out -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++ -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-linux -DVCPKG_HOST_TRIPLET=x64-linux
+      - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory)/cesium-native -B $(Build.SourcesDirectory)/cesium-native/out -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++ -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-linux -DVCPKG_HOST_TRIPLET=x64-linux
         displayName: 'Generate cmake project'
         env:
           GIT_LFS_SKIP_SMUDGE: 1        
