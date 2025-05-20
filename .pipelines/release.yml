@@ -126,8 +126,12 @@ jobs:
         submodules: recursive
         persistCredentials: true
 
-      - script: git config --global lfs.fetchinclude ""  # Ignore all LFS files
-        displayName: "Disable LFS"
+      - powershell: |
+        git lfs uninstall
+        git lfs install --skip-smudge
+
+      # - script: git config --global lfs.fetchinclude ""  # Ignore all LFS files
+        # displayName: "Disable LFS"
 
       - task: CMake@1
         displayName: 'Generate cmake project'
