@@ -114,7 +114,7 @@ jobs:
     displayName: Publish cesium-native on Windows
     condition: eq('${{parameters.WindowsBuild}}', true)
     pool:
-      vmImage: "windows-2019"
+      vmImage: "windows-2022"
     steps:
       - checkout: self
         lfs: false
