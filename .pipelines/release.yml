@@ -96,7 +96,7 @@ jobs:
       - task: PublishPipelineArtifact@1
         condition: eq('${{parameters.DryRun}}', true)
         inputs:
-          targetPath: '$(Build.SourcesDirectory)/cesium-native/upack-staging'
+          targetPath: '$(Build.SourcesDirectory)/cesium-native/upack-staging/linux'
           artifactName: 'cesium-native_x64_linux'
 
       - task: UniversalPackages@0
@@ -104,7 +104,7 @@ jobs:
         displayName: 'Publish cesium-native to Universal Package feed'
         inputs:
           command: "publish"
-          publishDirectory: "upack-staging/linux"
+          publishDirectory: "$(Build.SourcesDirectory)/cesium-native/upack-staging/linux"
           feedsToUsePublish: "internal"
           vstsFeedPublish: "upack"
           vstsFeedPackagePublish: "cesium_native_x64_linux"
@@ -180,7 +180,7 @@ jobs:
       - task: PublishPipelineArtifact@1
         condition: eq('${{parameters.DryRun}}', true)
         inputs:
-          targetPath: 'upack-staging'
+          targetPath: '$(Build.SourcesDirectory)/cesium-native/upack-staging/windows'
           artifactName: 'cesium-native_x64_win'
 
       - task: UniversalPackages@0      
@@ -188,7 +188,7 @@ jobs:
         displayName: 'Publish cesium-native to Universal Package feed'
         inputs:
           command: "publish"
-          publishDirectory: "upack-staging/windows"
+          publishDirectory: "$(Build.SourcesDirectory)/cesium-native/upack-staging/windows"
           feedsToUsePublish: "internal"
           vstsFeedPublish: "upack"
           vstsFeedPackagePublish: "cesium_native_x64_win"
