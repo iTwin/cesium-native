@@ -136,7 +136,7 @@ jobs:
         env:
           GIT_LFS_SKIP_SMUDGE: 1
           
-      - powershell: Get-Content -Path "$(Build.SourcesDirectory)vcpkg\buildtrees\ktx\git-archive-err.log"
+      - powershell: Get-Content -Path "$(Build.SourcesDirectory)\vcpkg\buildtrees\ktx\git-archive-err.log"
         displayName: 'Display file contents'
         condition: always()
 
