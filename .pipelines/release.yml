@@ -127,8 +127,8 @@ jobs:
         persistCredentials: true
 
       - powershell: |
-        git lfs uninstall
-        git lfs install --skip-smudge
+          git lfs uninstall
+          git lfs install --skip-smudge
 
       # - script: git config --global lfs.fetchinclude ""  # Ignore all LFS files
         # displayName: "Disable LFS"
