@@ -12,16 +12,17 @@ parameters:
     displayName: Windows build
     type: boolean
     default: false
+  - name: DryRun
+    displayName: Dry run (only publish to pipeline artifact)
+    type: boolean
+    default: false
     
 resources:
   repositories:
     - repository: vcpkg
       type: github
       name: microsoft/vcpkg
-      endpoint: github.com_test
-      
-variables:
-  GIT_LFS_SKIP_SMUDGE: 1 
+      endpoint: github.com_test 
 
 jobs:
   - job:
@@ -93,28 +94,30 @@ jobs:
 
       # Uncomment this task for testing without having to publish to upack feed
       - task: PublishPipelineArtifact@1
+        condition: eq('${{parameters.DryRun}}', true)
         inputs:
           targetPath: '$(Build.SourcesDirectory)/cesium-native/upack-staging'
           artifactName: 'cesium-native_x64_linux'
 
-      # - task: UniversalPackages@0
-        # displayName: 'Publish cesium-native to Universal Package feed'
-        # inputs:
-          # command: "publish"
-          # publishDirectory: "upack-staging/linux"
-          # feedsToUsePublish: "internal"
-          # vstsFeedPublish: "upack"
-          # vstsFeedPackagePublish: "cesium_native_x64_linux"
-          # versionOption: "custom"
-          # versionPublish: ${{parameters.PackageVersion}}
-        # env:
-          # AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+      - task: UniversalPackages@0
+        condition: eq('${{parameters.DryRun}}', false)
+        displayName: 'Publish cesium-native to Universal Package feed'
+        inputs:
+          command: "publish"
+          publishDirectory: "upack-staging/linux"
+          feedsToUsePublish: "internal"
+          vstsFeedPublish: "upack"
+          vstsFeedPackagePublish: "cesium_native_x64_linux"
+          versionOption: "custom"
+          versionPublish: ${{parameters.PackageVersion}}
+        env:
+          AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
   - job:
     displayName: Publish cesium-native on Windows
     condition: eq('${{parameters.WindowsBuild}}', true)
     pool:
-      name: imodelNative-Win11-VS2022
+      vmImage: "windows-2022"
     steps:
       - checkout: self
         lfs: false
@@ -126,23 +129,15 @@ jobs:
         submodules: recursive
         persistCredentials: true
 
+      # vcpkg does not allow enviroment variables to propagate on windows, so we reset the lfs settings to skip smudge and avoid lfs download errors which are not critical for us
       - powershell: |
           git lfs uninstall
           git lfs install --skip-smudge
-
-      # - script: git config --global lfs.fetchinclude ""  # Ignore all LFS files
-        # displayName: "Disable LFS"
 
       - task: CMake@1
         displayName: 'Generate cmake project'
         inputs:
           cmakeArgs: -S $(Build.SourcesDirectory)/cesium-native -B $(Build.SourcesDirectory)/cesium-native/build -G "Visual Studio 17 2022" -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-windows-static-md -DVCPKG_HOST_TRIPLET=x64-windows-static-md
-        env:
-          GIT_LFS_SKIP_SMUDGE: 1
-          
-      - powershell: Get-Content -Path "$(Build.SourcesDirectory)\vcpkg\buildtrees\ktx\git-archive-err.log"
-        displayName: 'Display file contents'
-        condition: always()
 
       - task: CMake@1
         displayName: 'Build CesiumGltfWriter target'
@@ -183,19 +178,21 @@ jobs:
 
       # Uncomment this task for testing without having to publish to upack feed     
       - task: PublishPipelineArtifact@1
+        condition: eq('${{parameters.DryRun}}', true)
         inputs:
           targetPath: 'upack-staging'
           artifactName: 'cesium-native_x64_win'
 
-      # - task: UniversalPackages@0
-        # displayName: 'Publish cesium-native to Universal Package feed'
-        # inputs:
-          # command: "publish"
-          # publishDirectory: "upack-staging/windows"
-          # feedsToUsePublish: "internal"
-          # vstsFeedPublish: "upack"
-          # vstsFeedPackagePublish: "cesium_native_x64_win"
-          # versionOption: "custom"
-          # versionPublish: ${{parameters.PackageVersion}}
-        # env:
-          # AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+      - task: UniversalPackages@0      
+        condition: eq('${{parameters.DryRun}}', false)
+        displayName: 'Publish cesium-native to Universal Package feed'
+        inputs:
+          command: "publish"
+          publishDirectory: "upack-staging/windows"
+          feedsToUsePublish: "internal"
+          vstsFeedPublish: "upack"
+          vstsFeedPackagePublish: "cesium_native_x64_win"
+          versionOption: "custom"
+          versionPublish: ${{parameters.PackageVersion}}
+        env:
+          AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
