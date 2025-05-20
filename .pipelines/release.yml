@@ -126,12 +126,19 @@ jobs:
         submodules: recursive
         persistCredentials: true
 
+      - script: git config --global lfs.fetchinclude ""  # Ignore all LFS files
+        displayName: "Disable LFS"
+
       - task: CMake@1
         displayName: 'Generate cmake project'
         inputs:
           cmakeArgs: -S $(Build.SourcesDirectory)/cesium-native -B $(Build.SourcesDirectory)/cesium-native/build -G "Visual Studio 17 2022" -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-windows-static-md -DVCPKG_HOST_TRIPLET=x64-windows-static-md
         env:
           GIT_LFS_SKIP_SMUDGE: 1
+          
+      - powershell: Get-Content -Path "$(Build.SourcesDirectory)vcpkg\buildtrees\ktx\git-archive-err.log"
+        displayName: 'Display file contents'
+        condition: always()
 
       - task: CMake@1
         displayName: 'Build CesiumGltfWriter target'
