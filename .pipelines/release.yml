@@ -41,19 +41,19 @@ jobs:
       - task: ExtractFiles@1
         displayName: 'Extract cmake executable'
         inputs:
-          archiveFilePatterns: "tools/cmake-linux.zip"
-          destinationFolder: "tools"
+          archiveFilePatterns: "$(Build.SourcesDirectory)/cesium-native/tools/cmake-linux.zip"
+          destinationFolder: "$(Build.SourcesDirectory)/cesium-native/tools"
           cleanDestinationFolder: false
 
       - script: chmod +x tools/cmake-linux/bin/cmake      
         displayName: 'chmod +x on cmake executable'
 
-      - script: tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory)/cesium-native -B $(Build.SourcesDirectory)/cesium-native/build -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++ -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-linux -DVCPKG_HOST_TRIPLET=x64-linux
+      - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory)/cesium-native -B $(Build.SourcesDirectory)/cesium-native/build -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++ -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-linux -DVCPKG_HOST_TRIPLET=x64-linux
         displayName: 'Generate cmake project'
         env:
           GIT_LFS_SKIP_SMUDGE: 1
 
-      - script: tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/cesium-native/build --target CesiumGltfWriter --config Release
+      - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/cesium-native/build --target CesiumGltfWriter --config Release
         displayName: 'Build CesiumGltfWriter target'
 
       - template: copy-include-files.yml
@@ -65,34 +65,34 @@ jobs:
         inputs:
           SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-linux/include/glm"
           Contents: "**"
-          TargetFolder: upack-staging/linux/include/glm
+          TargetFolder: $(Build.StagingDirectory)/upack-staging/linux/include/glm
 
       - task: CopyFiles@2
         displayName: 'Copy GSL include files to upack staging directory'
         inputs:
           SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-linux/include/gsl"
           Contents: "**"
-          TargetFolder: upack-staging/linux/include/gsl
+          TargetFolder: $(Build.StagingDirectory)/upack-staging/linux/include/gsl
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
         inputs:
-          SourceFolder: "build/CesiumGltfWriter"
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/CesiumGltfWriter"
           Contents: "*.a"
-          TargetFolder: upack-staging/linux/lib
+          TargetFolder: $(Build.StagingDirectory)/upack-staging/linux/lib
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumJsonWriter lib to upack staging directory'
         inputs:
-          SourceFolder: "build/CesiumJsonWriter"
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/CesiumJsonWriter"
           Contents: "*.a"
-          TargetFolder: upack-staging/linux/lib
+          TargetFolder: $(Build.StagingDirectory)/upack-staging/linux/lib
 
       # Uncomment this task for testing without having to publish to upack feed
-      # - task: PublishPipelineArtifact@1
-      #   inputs:
-      #     targetPath: 'upack-staging'
-      #     artifactName: 'cesium-native_x64_linux'
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(Build.StagingDirectory)/upack-staging'
+          artifactName: 'cesium-native_x64_linux'
 
       # - task: UniversalPackages@0
         # displayName: 'Publish cesium-native to Universal Package feed'
