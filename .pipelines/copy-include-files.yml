@@ -9,33 +9,33 @@ steps:
     inputs:
       SourceFolder: "$(Build.SourcesDirectory)/cesium-native/CesiumUtility/include/CesiumUtility"
       Contents: "**"
-      TargetFolder: $(Build.StagingDirectory)/upack-staging/${{ parameters.platform }}/include/CesiumUtility
+      TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/${{ parameters.platform }}/include/CesiumUtility
 
   - task: CopyFiles@2      
     displayName: 'Copy CesiumGltf include files to upack staging directory'
     inputs:
       SourceFolder: "$(Build.SourcesDirectory)/cesium-native/CesiumGltf/include/CesiumGltf"
       Contents: "**"
-      TargetFolder: $(Build.StagingDirectory)/upack-staging/${{ parameters.platform }}/include/CesiumGltf
+      TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/${{ parameters.platform }}/include/CesiumGltf
 
   - task: CopyFiles@2      
     displayName: 'Copy CesiumGltf generated include files to upack staging directory'
     inputs:
       SourceFolder: "$(Build.SourcesDirectory)/cesium-native/CesiumGltf/generated/include/CesiumGltf"
       Contents: "**"
-      TargetFolder: $(Build.StagingDirectory)/upack-staging/${{ parameters.platform }}/include/CesiumGltf
+      TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/${{ parameters.platform }}/include/CesiumGltf
 
   - task: CopyFiles@2
     displayName: 'Copy CesiumJsonWriter include files to upack staging directory'
     inputs:
       SourceFolder: "$(Build.SourcesDirectory)/cesium-native/CesiumJsonWriter/include/CesiumJsonWriter"
       Contents: "**"
-      TargetFolder: $(Build.StagingDirectory)/upack-staging/${{ parameters.platform }}/include/CesiumJsonWriter   
+      TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/${{ parameters.platform }}/include/CesiumJsonWriter   
 
   - task: CopyFiles@2
     displayName: 'Copy CesiumGltfWriter include files to upack staging directory'
     inputs:
       SourceFolder: "$(Build.SourcesDirectory)/cesium-native/CesiumGltfWriter/include/CesiumGltfWriter"
       Contents: "**"
-      TargetFolder: $(Build.StagingDirectory)/upack-staging/${{ parameters.platform }}/include/CesiumGltfWriter
+      TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/${{ parameters.platform }}/include/CesiumGltfWriter
 

@@ -19,6 +19,9 @@ resources:
       type: github
       name: microsoft/vcpkg
       endpoint: github.com_test
+      
+variables:
+  GIT_LFS_SKIP_SMUDGE: 1 
 
 jobs:
   - job:
@@ -65,33 +68,33 @@ jobs:
         inputs:
           SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-linux/include/glm"
           Contents: "**"
-          TargetFolder: $(Build.StagingDirectory)/upack-staging/linux/include/glm
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/linux/include/glm
 
       - task: CopyFiles@2
         displayName: 'Copy GSL include files to upack staging directory'
         inputs:
           SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-linux/include/gsl"
           Contents: "**"
-          TargetFolder: $(Build.StagingDirectory)/upack-staging/linux/include/gsl
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/linux/include/gsl
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
         inputs:
           SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/CesiumGltfWriter"
           Contents: "*.a"
-          TargetFolder: $(Build.StagingDirectory)/upack-staging/linux/lib
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/linux/lib
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumJsonWriter lib to upack staging directory'
         inputs:
           SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/CesiumJsonWriter"
           Contents: "*.a"
-          TargetFolder: $(Build.StagingDirectory)/upack-staging/linux/lib
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/lib
 
       # Uncomment this task for testing without having to publish to upack feed
       - task: PublishPipelineArtifact@1
         inputs:
-          targetPath: '$(Build.StagingDirectory)/upack-staging'
+          targetPath: '$(Build.SourcesDirectory)/cesium-native/upack-staging'
           artifactName: 'cesium-native_x64_linux'
 
       # - task: UniversalPackages@0
@@ -114,21 +117,26 @@ jobs:
       vmImage: "windows-2019"
     steps:
       - checkout: self
-        lfs: true
+        lfs: false
+        submodules: recursive
+        persistCredentials: true      
+                
+      - checkout: vcpkg
+        lfs: false
         submodules: recursive
         persistCredentials: true
 
       - task: CMake@1
         displayName: 'Generate cmake project'
         inputs:
-          cmakeArgs: -S $(Build.SourcesDirectory) -B $(Build.SourcesDirectory)/build -G "Visual Studio 16 2019"
+          cmakeArgs: -S $(Build.SourcesDirectory)/cesium-native -B $(Build.SourcesDirectory)/cesium-native/build -G "Visual Studio 16 2019"
         env:
           GIT_LFS_SKIP_SMUDGE: 1
 
       - task: CMake@1
         displayName: 'Build CesiumGltfWriter target'
         inputs:
-          cmakeArgs: --build $(Build.SourcesDirectory)/build --target CesiumGltfWriter --config Release
+          cmakeArgs: --build $(Build.SourcesDirectory)/cesium-native/build --target CesiumGltfWriter --config Release
       
       - template: copy-include-files.yml       
         parameters:
@@ -137,36 +145,36 @@ jobs:
       - task: CopyFiles@2
         displayName: 'Copy glm files to upack staging directory'
         inputs:
-          SourceFolder: "build/vcpkg_installed/x64-windows-static-md/include/glm"
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-windows-static-md/include/glm"
           Contents: "**"
-          TargetFolder: upack-staging/windows/include/glm
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/include/glm
 
       - task: CopyFiles@2
         displayName: 'Copy GSL include files to upack staging directory'
         inputs:
-          SourceFolder: "build/vcpkg_installed/x64-windows-static-md/include/gsl"
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-windows-static-md/include/gsl"
           Contents: "**"
-          TargetFolder: upack-staging/windows/include/gsl
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/include/gsl
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
         inputs:
-          SourceFolder: "build/CesiumGltfWriter/Release"
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/CesiumGltfWriter/Release"
           Contents: "*.lib"
-          TargetFolder: upack-staging/windows/lib
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/lib
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
         inputs:
-          SourceFolder: "build/CesiumJsonWriter/Release"
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/CesiumJsonWriter/Release"
           Contents: "*.lib"
-          TargetFolder: upack-staging/windows/lib
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/lib
 
       # Uncomment this task for testing without having to publish to upack feed     
-      # - task: PublishPipelineArtifact@1
-      #   inputs:
-      #     targetPath: 'upack-staging'
-      #     artifactName: 'cesium-native_x64_win'
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: 'upack-staging'
+          artifactName: 'cesium-native_x64_win'
 
       # - task: UniversalPackages@0
         # displayName: 'Publish cesium-native to Universal Package feed'
