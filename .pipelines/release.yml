@@ -69,14 +69,14 @@ jobs:
         inputs:
           SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-linux/include/glm"
           Contents: "**"
-          TargetFolder: $(Build.SourcesDirectory)/cesium-native/linux/include/glm
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/include/glm
 
       - task: CopyFiles@2
         displayName: 'Copy GSL include files to upack staging directory'
         inputs:
           SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-linux/include/gsl"
           Contents: "**"
-          TargetFolder: $(Build.SourcesDirectory)/cesium-native/linux/include/gsl
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/include/gsl
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
