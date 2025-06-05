@@ -9,6 +9,7 @@
             <VendorAPI Domain="CesiumGltfWriter"/>
             <VendorAPI Domain="glm"/>
             <VendorAPI Domain="gsl"/>
+            <VendorAPI Domain="spdlog">
             <Libs>Delivery/$(stlibprefix)CesiumGltfWriter$(stlibext)</Libs>
             <Libs>Delivery/$(stlibprefix)CesiumJsonWriter$(stlibext)</Libs>
         </Bindings>
