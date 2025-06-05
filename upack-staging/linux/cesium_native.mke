@@ -36,5 +36,7 @@ always:
     ~linkmultifiles "$(CesiumVendorApi)gsl=$(include)/gsl/*"
     ~linkmultifiles "$(CesiumVendorApi)spdlog=$(include)/spdlog/*"
     ~linkmultifiles "$(CesiumVendorApi)spdlog/fmt=$(include)/spdlog/fmt/*"
+    ~linkmultifiles "$(CesiumVendorApi)fmt=$(include)/spdlog/fmt/*"
+    ~linkmultifiles "$(CesiumVendorApi)spdlog/bundled/fmt=$(include)/spdlog/fmt/*"
     ~linkfile "$(ContextDeliveryDir)$(stlibprefix)CesiumGltfWriter$(stlibext)=$(lib)/$(stlibprefix)CesiumGltfWriter$(stlibext)"
     ~linkfile "$(ContextDeliveryDir)$(stlibprefix)CesiumJsonWriter$(stlibext)=$(lib)/$(stlibprefix)CesiumJsonWriter$(stlibext)"
