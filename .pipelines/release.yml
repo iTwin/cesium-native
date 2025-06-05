@@ -79,6 +79,13 @@ jobs:
           TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/include/gsl
 
       - task: CopyFiles@2
+        displayName: 'Copy spdlog include files to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-linux/include/spdlog"
+          Contents: "**"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/include/spdlog
+
+      - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
         inputs:
           SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/CesiumGltfWriter"
@@ -161,6 +168,13 @@ jobs:
           SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-windows-static-md/include/gsl"
           Contents: "**"
           TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/include/gsl
+
+      - task: CopyFiles@2
+        displayName: 'Copy spdlog include files to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-windows-static-md/include/spdlog"
+          Contents: "**"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/include/spdlog
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
