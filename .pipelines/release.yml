@@ -83,7 +83,7 @@ jobs:
         inputs:
           SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/CesiumGltfWriter"
           Contents: "*.a"
-          TargetFolder: $(Build.SourcesDirectory)/cesium-native/linux/lib
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/lib
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumJsonWriter lib to upack staging directory'
