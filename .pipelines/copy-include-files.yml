@@ -42,14 +42,14 @@ steps:
   - task: CopyFiles@2
     displayName: 'Copy extern/glm include files to upack staging directory'
     inputs:
-      SourceFolder: "extern/glm/glm"
+      SourceFolder: out/vcpkg_installed/x64-${{ parameters.platform }}/include/glm
       Contents: "**"
       TargetFolder: upack-staging/${{ parameters.platform }}/include/glm
 
   - task: CopyFiles@2
     displayName: 'Copy extern/GSL include files to upack staging directory'
     inputs:
-      SourceFolder: "extern/GSL/include/gsl"
+      SourceFolder: out/vcpkg_installed/x64-${{ parameters.platform }}/include/gsl
       Contents: "**"
       TargetFolder: upack-staging/${{ parameters.platform }}/include/gsl
 
