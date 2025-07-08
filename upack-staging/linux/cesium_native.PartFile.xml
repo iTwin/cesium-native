@@ -13,6 +13,7 @@
             <VendorAPI Domain="fmt"/>
             <Libs>Delivery/$(stlibprefix)CesiumGltfWriter$(stlibext)</Libs>
             <Libs>Delivery/$(stlibprefix)CesiumJsonWriter$(stlibext)</Libs>
+            <Libs>Delivery/$(stlibprefix)fmt$(stlibext)</Libs>
         </Bindings>
     </Part>
 
