@@ -106,6 +106,13 @@ jobs:
           Contents: "*.a"
           TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/lib
 
+      - task: CopyFiles@2
+        displayName: 'Copy fmt lib to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-linux/lib"
+          Contents: "libfmt.a"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/lib
+
       # Uncomment this task for testing without having to publish to upack feed
       - task: PublishPipelineArtifact@1
         condition: eq('${{parameters.DryRun}}', true)
@@ -198,10 +205,17 @@ jobs:
           TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/lib
 
       - task: CopyFiles@2
-        displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
+        displayName: 'Copy CesiumJsonWriter lib to upack staging directory'
         inputs:
           SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/CesiumJsonWriter/Release"
           Contents: "*.lib"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/lib
+
+      - task: CopyFiles@2
+        displayName: 'Copy fmt lib to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-windows-static-md/lib"
+          Contents: "fmt.lib"
           TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/lib
 
       # Uncomment this task for testing without having to publish to upack feed     
