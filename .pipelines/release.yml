@@ -12,6 +12,17 @@ parameters:
     displayName: Windows build
     type: boolean
     default: false
+  - name: DryRun
+    displayName: Dry run (only publish to pipeline artifact)
+    type: boolean
+    default: false
+    
+resources:
+  repositories:
+    - repository: vcpkg
+      type: github
+      name: microsoft/vcpkg
+      endpoint: github.com_test 
 
 jobs:
   - job:
@@ -24,53 +35,97 @@ jobs:
       - checkout: self
         lfs: true
         submodules: recursive
+        persistCredentials: true        
+                
+      - checkout: vcpkg
+        lfs: true
+        submodules: recursive
         persistCredentials: true
 
       - task: ExtractFiles@1
         displayName: 'Extract cmake executable'
         inputs:
-          archiveFilePatterns: "tools/cmake-linux.zip"
-          destinationFolder: "tools"
+          archiveFilePatterns: "$(Build.SourcesDirectory)/cesium-native/tools/cmake-linux.zip"
+          destinationFolder: "$(Build.SourcesDirectory)/cesium-native/tools"
           cleanDestinationFolder: false
 
-      - script: chmod +x tools/cmake-linux/bin/cmake      
+      - script: chmod +x $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake      
         displayName: 'chmod +x on cmake executable'
 
-      - script: tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory) -B $(Build.SourcesDirectory)/out -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++
+      - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake -S $(Build.SourcesDirectory)/cesium-native -B $(Build.SourcesDirectory)/cesium-native/build -D CMAKE_C_COMPILER=/usr/lib/llvm-16/bin/clang -D CMAKE_CXX_COMPILER=/usr/lib/llvm-16/bin/clang++ -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-linux -DVCPKG_HOST_TRIPLET=x64-linux
         displayName: 'Generate cmake project'
+        env:
+          GIT_LFS_SKIP_SMUDGE: 1
 
-      - script: tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/out --target CesiumGltfWriter --config Release
+      - script: $(Build.SourcesDirectory)/cesium-native/tools/cmake-linux/bin/cmake --build $(Build.SourcesDirectory)/cesium-native/build --target CesiumGltfWriter --config Release
         displayName: 'Build CesiumGltfWriter target'
 
       - template: copy-include-files.yml
         parameters:
-          platform: linux 
+          platform: linux
+
+      - task: CopyFiles@2
+        displayName: 'Copy glm files to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-linux/include/glm"
+          Contents: "**"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/include/glm
+
+      - task: CopyFiles@2
+        displayName: 'Copy GSL include files to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-linux/include/gsl"
+          Contents: "**"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/include/gsl
+
+      - task: CopyFiles@2
+        displayName: 'Copy spdlog include files to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-linux/include/spdlog"
+          Contents: "**"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/include/spdlog
+
+      - task: CopyFiles@2
+        displayName: 'Copy fmt include files to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-linux/include/fmt"
+          Contents: "**"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/include/fmt
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
         inputs:
-          SourceFolder: "out/CesiumGltfWriter"
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/CesiumGltfWriter"
           Contents: "*.a"
-          TargetFolder: upack-staging/linux/lib
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/lib
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumJsonWriter lib to upack staging directory'
         inputs:
-          SourceFolder: "out/CesiumJsonWriter"
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/CesiumJsonWriter"
           Contents: "*.a"
-          TargetFolder: upack-staging/linux/lib
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/lib
+
+      - task: CopyFiles@2
+        displayName: 'Copy fmt lib to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-linux/lib"
+          Contents: "libfmt.a"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/linux/lib
 
       # Uncomment this task for testing without having to publish to upack feed
-      # - task: PublishPipelineArtifact@1
-      #   inputs:
-      #     targetPath: 'upack-staging'
-      #     artifactName: 'cesium-native_x64_linux'
+      - task: PublishPipelineArtifact@1
+        condition: eq('${{parameters.DryRun}}', true)
+        inputs:
+          targetPath: '$(Build.SourcesDirectory)/cesium-native/upack-staging/linux'
+          artifactName: 'cesium-native_x64_linux'
 
       - task: UniversalPackages@0
+        condition: eq('${{parameters.DryRun}}', false)
         displayName: 'Publish cesium-native to Universal Package feed'
         inputs:
           command: "publish"
-          publishDirectory: "upack-staging/linux"
+          publishDirectory: "$(Build.SourcesDirectory)/cesium-native/upack-staging/linux"
           feedsToUsePublish: "internal"
           vstsFeedPublish: "upack"
           vstsFeedPackagePublish: "cesium_native_x64_linux"
@@ -83,52 +138,99 @@ jobs:
     displayName: Publish cesium-native on Windows
     condition: eq('${{parameters.WindowsBuild}}', true)
     pool:
-      vmImage: "windows-2019"
+      vmImage: "windows-2022"
     steps:
       - checkout: self
-        lfs: true
+        lfs: false
+        submodules: recursive
+        persistCredentials: true      
+                
+      - checkout: vcpkg
+        lfs: false
         submodules: recursive
         persistCredentials: true
+
+      # vcpkg does not allow enviroment variables to propagate on windows, so we reset the lfs settings to skip smudge and avoid lfs download errors which are not critical for us
+      - powershell: |
+          git lfs uninstall
+          git lfs install --skip-smudge
 
       - task: CMake@1
         displayName: 'Generate cmake project'
         inputs:
-          cmakeArgs: -S $(Build.SourcesDirectory) -B $(Build.SourcesDirectory)/out -G "Visual Studio 16 2019"
+          cmakeArgs: -S $(Build.SourcesDirectory)/cesium-native -B $(Build.SourcesDirectory)/cesium-native/build -G "Visual Studio 17 2022" -DCMAKE_TOOLCHAIN_FILE=$(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake -DCESIUM_USE_EZVCPKG=OFF -DVCPKG_TARGET_TRIPLET=x64-windows-static-md -DVCPKG_HOST_TRIPLET=x64-windows-static-md
 
       - task: CMake@1
         displayName: 'Build CesiumGltfWriter target'
         inputs:
-          cmakeArgs: --build $(Build.SourcesDirectory)/out --target CesiumGltfWriter --config Release
+          cmakeArgs: --build $(Build.SourcesDirectory)/cesium-native/build --target CesiumGltfWriter --config Release
       
       - template: copy-include-files.yml       
         parameters:
           platform: windows 
 
       - task: CopyFiles@2
-        displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
+        displayName: 'Copy glm files to upack staging directory'
         inputs:
-          SourceFolder: "out/CesiumGltfWriter/Release"
-          Contents: "*.lib"
-          TargetFolder: upack-staging/windows/lib
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-windows-static-md/include/glm"
+          Contents: "**"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/include/glm
+
+      - task: CopyFiles@2
+        displayName: 'Copy GSL include files to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-windows-static-md/include/gsl"
+          Contents: "**"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/include/gsl
+
+      - task: CopyFiles@2
+        displayName: 'Copy spdlog include files to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-windows-static-md/include/spdlog"
+          Contents: "**"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/include/spdlog
+
+      - task: CopyFiles@2
+        displayName: 'Copy fmt include files to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-windows-static-md/include/fmt"
+          Contents: "**"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/include/fmt
 
       - task: CopyFiles@2
         displayName: 'Copy CesiumGltfWriter lib to upack staging directory'
         inputs:
-          SourceFolder: "out/CesiumJsonWriter/Release"
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/CesiumGltfWriter/Release"
           Contents: "*.lib"
-          TargetFolder: upack-staging/windows/lib
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/lib
+
+      - task: CopyFiles@2
+        displayName: 'Copy CesiumJsonWriter lib to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/CesiumJsonWriter/Release"
+          Contents: "*.lib"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/lib
+
+      - task: CopyFiles@2
+        displayName: 'Copy fmt lib to upack staging directory'
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/cesium-native/build/vcpkg_installed/x64-windows-static-md/lib"
+          Contents: "fmt.lib"
+          TargetFolder: $(Build.SourcesDirectory)/cesium-native/upack-staging/windows/lib
 
       # Uncomment this task for testing without having to publish to upack feed     
-      # - task: PublishPipelineArtifact@1
-      #   inputs:
-      #     targetPath: 'upack-staging'
-      #     artifactName: 'cesium-native_x64_win'
+      - task: PublishPipelineArtifact@1
+        condition: eq('${{parameters.DryRun}}', true)
+        inputs:
+          targetPath: '$(Build.SourcesDirectory)/cesium-native/upack-staging/windows'
+          artifactName: 'cesium-native_x64_win'
 
-      - task: UniversalPackages@0
+      - task: UniversalPackages@0      
+        condition: eq('${{parameters.DryRun}}', false)
         displayName: 'Publish cesium-native to Universal Package feed'
         inputs:
           command: "publish"
-          publishDirectory: "upack-staging/windows"
+          publishDirectory: "$(Build.SourcesDirectory)/cesium-native/upack-staging/windows"
           feedsToUsePublish: "internal"
           vstsFeedPublish: "upack"
           vstsFeedPackagePublish: "cesium_native_x64_win"
